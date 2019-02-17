@@ -7,7 +7,6 @@ import { Observable } from 'rxjs';
 const MIN_SEARCH_INDEX = 0;
 const MIN_RECORD_INDEX = 0;
 const DEFAULT_TIMEOUT = 2000;
-const EXECUTE_IMMEDIATELY = 0;
 
 export class CustomersService implements ICustomersService, ICustomersAsyncService {
   private customers: Customer[] = [
@@ -108,14 +107,12 @@ export class CustomersService implements ICustomersService, ICustomersAsyncServi
   }
 
   searchCustomersAsync(searchString: string): Observable<Customer[]> {
-    const observable = Observable.create();
-
-    setTimeout(() => {
+    const observable = Observable.create((observer: any) => {
       const filteredCustomers = this.searchCustomers(searchString);
 
-      observable.next(filteredCustomers);
-      observable.complete();
-    }, EXECUTE_IMMEDIATELY);
+      observer.next(filteredCustomers);
+      observer.complete();
+    });
 
     return observable;
   }

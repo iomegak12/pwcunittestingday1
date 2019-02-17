@@ -108,8 +108,38 @@ describe('Customer Service Test Suite', () => {
     );
   });
 
+  it('Should getCustomerByIdAsync() returns filtered customer record', async () => {
+    const customerId = 1;
+    const expectedCustomerName = 'Northwind Traders';
+    const actualCustomer = await customersAsyncService.getCustomerByIdAsync(customerId);
+
+    expect(actualCustomer).toBeTruthy();
+    expect(actualCustomer.name).toBe(expectedCustomerName);
+  });
+
   afterEach(() => {
     customerService = null;
     customersAsyncService = null;
+  });
+
+  it('Should searchCustomersAsync() returns filtered customers in observable', done => {
+    const searchString = 'wind';
+    const expectedNoOfCustomers = 4;
+    const observable = customersAsyncService.searchCustomersAsync(searchString);
+
+    observable.subscribe(
+      result => {
+        const actualNoOfCustomers = result.length;
+        const expectedFirstCustomerName = 'Northwind Traders';
+        const actualFirstCustomerName = result[0].name;
+
+        expect(actualNoOfCustomers).toBe(expectedNoOfCustomers);
+        expect(actualFirstCustomerName).toBe(expectedFirstCustomerName);
+      },
+      error => {},
+      () => {
+        done();
+      }
+    );
   });
 });
