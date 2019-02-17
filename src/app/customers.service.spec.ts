@@ -2,9 +2,11 @@ import { ICustomersService } from './icustomers.service';
 import { CustomersService } from './customers.service';
 import { IEmailService } from './iemail.service';
 import { Customer } from './customer';
+import { ICustomersAsyncService } from './icustomersasync.service';
 
 describe('Customer Service Test Suite', () => {
   let customerService: ICustomersService;
+  let customersAsyncService: ICustomersAsyncService;
   let fakeEmailService: IEmailService;
 
   beforeEach(() => {
@@ -17,14 +19,15 @@ describe('Customer Service Test Suite', () => {
     spyOn(fakeEmailService, 'sendEmail').and.callThrough();
 
     customerService = new CustomersService(fakeEmailService);
+    customersAsyncService = new CustomersService(fakeEmailService);
   });
 
-  it('Should have been instantiated', () => {
+  xit('Should have been instantiated', () => {
     expect(customerService).toBeDefined();
     expect(customerService).toBeTruthy();
   });
 
-  it('Should getCustomers() return data', () => {
+  xit('Should getCustomers() return data', () => {
     const expectedNoOfCustomers = 6;
     const expectedFirstCustomerId = 1;
     const expectedFirstCustomerName = 'Northwind Traders';
@@ -36,7 +39,7 @@ describe('Customer Service Test Suite', () => {
     expect(actualCustomers[0].name).toBe(expectedFirstCustomerName);
   });
 
-  it('Should searchCustomers() return filtered data', () => {
+  xit('Should searchCustomers() return filtered data', () => {
     const filterString = 'rich';
     const expectedNoOfCustomers = 1;
     const expectedCustomerName = 'Oxyrich Traders';
@@ -49,7 +52,7 @@ describe('Customer Service Test Suite', () => {
     expect(actualCustomers[0].name).toBe(expectedCustomerName);
   });
 
-  it('Should getCustomerById() reutrn filtered customer record', () => {
+  xit('Should getCustomerById() reutrn filtered customer record', () => {
     const customerId = 1;
     const expectedCustomerName = 'Northwind Traders';
     const actualCustomer = customerService.getCustomerById(customerId);
@@ -58,7 +61,7 @@ describe('Customer Service Test Suite', () => {
     expect(actualCustomer.name).toBe(expectedCustomerName);
   });
 
-  it('Should getCustomerById() with invalid customer id throw an exception', () => {
+  xit('Should getCustomerById() with invalid customer id throw an exception', () => {
     const customerId = 101;
 
     expect(() => {
@@ -80,7 +83,33 @@ describe('Customer Service Test Suite', () => {
     expect(fakeEmailService.sendEmail).toHaveBeenCalledWith(from, to, subject, body);
   });
 
+  it('Should getCustomersAsync() returns results', done => {
+    const promise = customersAsyncService.getCustomersAsync();
+
+    promise.then(
+      result => {
+        const expectedNoOfCustomers = 6;
+        const firstCustomerName = 'Northwind Traders';
+        const firstCustomerId = 1;
+        const actualCustomerName = result[0].name;
+        const actualCustomerId = result[0].id;
+        const actualNoOfCustomers = result.length;
+
+        expect(result).toBeTruthy();
+        expect(actualCustomerName).toBe(firstCustomerName);
+        expect(actualCustomerId).toBe(firstCustomerId);
+        expect(actualNoOfCustomers).toBe(expectedNoOfCustomers);
+
+        done();
+      },
+      error => {
+        throw error;
+      }
+    );
+  });
+
   afterEach(() => {
     customerService = null;
+    customersAsyncService = null;
   });
 });
